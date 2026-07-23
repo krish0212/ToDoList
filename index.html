@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Python To-Do List</title>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: monospace; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        h2 { color: #38bdf8; }
+        .back-link { color: #38bdf8; text-decoration: none; margin-bottom: 20px; }
+        .terminal { background: #1e1e1e; width: 90%; max-width: 650px; height: 420px; border-radius: 8px; padding: 15px; overflow-y: auto; border: 1px solid #334155; box-sizing: border-box; }
+        .line { margin: 4px 0; }
+        .input-line { display: flex; }
+        .prompt { color: #4ade80; margin-right: 8px; }
+        input { background: transparent; border: none; color: #f8fafc; font-size: 16px; outline: none; flex: 1; font-family: inherit; }
+    </style>
+</head>
+<body>
+    <h2>Python To-Do List Application</h2>
+    <div class="terminal" id="terminal">
+        <div id="output"></div>
+        <div class="input-line">
+            <span class="prompt" id="promptText">></span>
+            <input type="text" id="userInput" autofocus autocomplete="off">
+        </div>
+    </div>
+    <script>
+        const output = document.getElementById('output');
+        const userInput = document.getElementById('userInput');
+        const promptText = document.getElementById('promptText');
+        const terminal = document.getElementById('terminal');
+        let tasks = [];
+        let step = 'MENU';
+
+        function printMenu() {
+            appendOutput("\n===== TO-DO LIST MENU =====", "#38bdf8");
+            appendOutput("1. View Tasks");
+            appendOutput("2. Add Task");
+            appendOutput("3. Delete Task");
+            appendOutput("4. Exit");
+            promptText.innerText = "Enter choice: ";
+            step = 'MENU';
+        }
+
+        function appendOutput(text, color = '#f8fafc') {
+            const line = document.createElement('div');
+            line.className = 'line';
+            line.style.color = color;
+            line.innerText = text;
+            output.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        userInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const val = userInput.value.trim();
+                appendOutput(promptText.innerText + val, '#a7f3d0');
+                userInput.value = '';
+
+                if (step === 'MENU') {
+                    if (val === '1') {
+                        if(tasks.length === 0) appendOutput("No tasks added yet!", "#f87171");
+                        else tasks.forEach((t, i) => appendOutput(`${i + 1}. ${t}`, "#4ade80"));
+                        printMenu();
+                    } else if (val === '2') {
+                        step = 'ADD';
+                        promptText.innerText = "Enter task name: ";
+                    } else if (val === '3') {
+                        step = 'DELETE';
+                        promptText.innerText = "Enter task number to delete: ";
+                    } else if (val === '4') {
+                        appendOutput("Goodbye!", "#f43f5e");
+                        userInput.disabled = true;
+                    } else {
+                        appendOutput("Invalid choice!", "#f87171");
+                        printMenu();
+                    }
+                } else if (step === 'ADD') {
+                    if(val) { tasks.push(val); appendOutput(`Task '${val}' added!`, '#4ade80'); }
+                    printMenu();
+                } else if (step === 'DELETE') {
+                    let idx = parseInt(val) - 1;
+                    if(idx >= 0 && idx < tasks.length) {
+                        let removed = tasks.splice(idx, 1);
+                        appendOutput(`Removed: '${removed[0]}'`, '#4ade80');
+                    } else appendOutput("Invalid task number!", "#f87171");
+                    printMenu();
+                }
+            }
+        });
+        printMenu();
+    </script>
+</body>
+</html>
